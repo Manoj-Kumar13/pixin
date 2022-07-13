@@ -3,13 +3,13 @@ import {
   View,
   Text,
   FlatList,
-  Button,
-  TextInput,
   StyleSheet,
   TouchableHighlight,
 } from "react-native";
 import firebase from "firebase";
 require("firebase/firestore");
+import { Divider, Button, ListItem, Avatar } from "@rneui/themed";
+import { TextInput } from "react-native-paper";
 
 import { connect } from "react-redux";
 import { bindActionCreators } from "redux";
@@ -78,36 +78,60 @@ function Comments(props) {
 
   return (
     <View>
-      <View>
+      <View style={{ padding: 10 }}>
         <TextInput
-          style={styles.text}
-          placeholder="Comment..."
+          label="Comment"
+          mode="outlined"
+          placeholder="Write here..."
+          selectionColor="#ed5b2d"
+          activeOutlineColor="#ed5b2d"
           value={text}
           onChangeText={(text) => {
             setText(text);
           }}
         />
-        <TouchableHighlight style={styles.button}>
-          <Button
-            title="Send"
-            onPress={() => {
-              onCommentSend();
-            }}
-          />
-        </TouchableHighlight>
+        <Button
+          title="Send"
+          onPress={() => {
+            onCommentSend();
+          }}
+          color="#ed5b2d"
+          buttonStyle={{ margin: 10, borderRadius: 20 }}
+        />
       </View>
+      <Divider inset insetType="middle" />
       <FlatList
         style={styles.listContainer}
         numColumns={1}
         horizontal={false}
         data={comments}
-        renderItem={({ item }) => (
-          <View style={styles.listItem}>
-            {item.user !== undefined ? (
-              <Text style={styles.username}>{item.user.name}</Text>
-            ) : null}
-            <Text style={styles.comment}>{item.text}</Text>
-          </View>
+        renderItem={({ item, index }) => (
+          <ListItem
+            key={index}
+            bottomDivider={true}
+            containerStyle={{ marginBottom: 5, borderRadius: 10 }}
+          >
+            <ListItem.Content>
+              <View style={styles.cardStyle}>
+                <Avatar
+                  title={item?.user?.name[0]}
+                  rounded
+                  containerStyle={{ backgroundColor: "#ed5b2d" }}
+                  avatarStyle={styles.avatarStyle}
+                />
+                <View style={styles.text}>
+                  <ListItem.Title>
+                    {item.user != undefined ? (
+                      <Text style={{ fontSize: 18, fontWeight: "bold" }}>
+                        {item.user.name}
+                      </Text>
+                    ) : null}
+                  </ListItem.Title>
+                  <ListItem.Subtitle>{item.text}</ListItem.Subtitle>
+                </View>
+              </View>
+            </ListItem.Content>
+          </ListItem>
         )}
       />
     </View>
@@ -142,6 +166,21 @@ const styles = StyleSheet.create({
   comment: {
     fontSize: 20,
     fontWeight: "bold",
+  },
+  listContainer: {
+    padding: 15,
+    marginBottom: 120,
+  },
+  text: {
+    fontSize: 20,
+    marginLeft: 20,
+  },
+  cardStyle: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  avatarStyle: {
+    borderRadius: 20,
   },
 });
 

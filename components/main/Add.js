@@ -3,6 +3,7 @@ import { StyleSheet, Text, View, Button, Image } from "react-native";
 import { Camera } from "expo-camera";
 import { Dimensions } from "react-native";
 import * as ImagePicker from "expo-image-picker";
+import { Icon } from "@rneui/themed";
 
 export default function Add({ navigation }) {
   const [hasGalleryPermission, setHasGalleryPermission] = useState(null);
@@ -28,10 +29,16 @@ export default function Add({ navigation }) {
 
   const takePicture = async () => {
     if (camera) {
-      const data = await camera.takePictureAsync(null);
+      const data = await camera.takePictureAsync({
+        quality: 0.65,
+      });
       setImage(data.uri);
     }
   };
+
+  if (image) {
+    navigation.navigate("Save", { image });
+  }
 
   const pickImage = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
@@ -68,24 +75,38 @@ export default function Add({ navigation }) {
           ratio={"4:3"}
         />
       </View>
-
-      <Button
-        title="Flip Image"
-        onPress={() => {
-          setType(
-            type === Camera.Constants.Type.back
-              ? Camera.Constants.Type.front
-              : Camera.Constants.Type.back
-          );
-        }}
-      ></Button>
-      <Button title="Take Picture" onPress={() => takePicture()} />
-      <Button title="Pick Image From Gallery" onPress={() => pickImage()} />
-      <Button
-        title="Save"
-        onPress={() => navigation.navigate("Save", { image })}
-      />
-      {image && <Image source={{ uri: image }} style={{ flex: 1 }} />}
+      <View style={styles.controlContainer}>
+        <Icon
+          raised
+          name="picture"
+          type="fontisto"
+          color="#f50"
+          size={30}
+          onPress={() => pickImage()}
+        />
+        <Icon
+          raised
+          name="circle"
+          type="entypo"
+          color="#f50"
+          size={50}
+          onPress={() => takePicture()}
+        />
+        <Icon
+          raised
+          name="flip-camera-android"
+          type="materialicons"
+          color="#f50"
+          size={30}
+          onPress={() => {
+            setType(
+              type === Camera.Constants.Type.back
+                ? Camera.Constants.Type.front
+                : Camera.Constants.Type.back
+            );
+          }}
+        />
+      </View>
     </View>
   );
 }
@@ -94,9 +115,19 @@ const styles = StyleSheet.create({
   cameraContainer: {
     flex: 1,
     flexDirection: "row",
+    // borderWidth: 2,
+    // borderColor: "blue",
   },
   fixedRatio: {
     flex: 1,
     aspectRatio: 1,
+  },
+  controlContainer: {
+    // borderWidth: 2,
+    borderColor: "red",
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-evenly",
+    flex: 0.35,
   },
 });

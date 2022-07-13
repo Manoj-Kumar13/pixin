@@ -38,30 +38,44 @@ export default function Search(props) {
       />
       <View style={styles.listContainer}>
         <ScrollView showsVerticalScrollIndicator={false}>
-          {users.map((user, index) => (
-            <ListItem
-              key={index}
-              bottomDivider={true}
-              containerStyle={{ marginBottom: 5, borderRadius: 10 }}
-              onPress={() => {
-                props.navigation.navigate("Profile", { uid: user.id });
-              }}
-            >
-              <ListItem.Content>
-                <View style={styles.cardStyle}>
-                  <Avatar
-                    source={{ uri: user.downloadURL }}
-                    avatarStyle={styles.avatarStyle}
-                  />
-                  <View style={styles.text}>
-                    <ListItem.Title>
-                      <Text>{user.name}</Text>
-                    </ListItem.Title>
+          {users.map((user, index) => {
+            const picUri = user?.downloadURL;
+            return (
+              <ListItem
+                key={index}
+                bottomDivider={true}
+                containerStyle={{ marginBottom: 5, borderRadius: 10 }}
+                onPress={() => {
+                  props.navigation.navigate("Profile", { uid: user.id });
+                }}
+              >
+                <ListItem.Content>
+                  <View style={styles.cardStyle}>
+                    {user.downloadURL ? (
+                      <Avatar
+                        source={{ uri: user.downloadURL }}
+                        avatarStyle={styles.avatarStyle}
+                      />
+                    ) : (
+                      <Avatar
+                        title={user.name[0]}
+                        rounded
+                        containerStyle={{ backgroundColor: "#ed5b2d" }}
+                        avatarStyle={styles.avatarStyle}
+                      />
+                    )}
+                    <View style={styles.text}>
+                      <ListItem.Title>
+                        <Text style={{ fontSize: 18, fontWeight: "bold" }}>
+                          {user.name}
+                        </Text>
+                      </ListItem.Title>
+                    </View>
                   </View>
-                </View>
-              </ListItem.Content>
-            </ListItem>
-          ))}
+                </ListItem.Content>
+              </ListItem>
+            );
+          })}
         </ScrollView>
       </View>
     </View>

@@ -17,6 +17,7 @@ import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityI
 require("firebase/firestore");
 require("firebase/firebase-storage");
 import { Button } from "@rneui/themed";
+import { Divider } from "@rneui/themed";
 
 function Profile(props) {
   const [userPosts, setUserPosts] = useState([]);
@@ -32,7 +33,7 @@ function Profile(props) {
       setUser(currentUser);
       setUserPosts(posts);
       {
-        currentUser.downloadURL
+        currentUser?.downloadURL
           ? setImageURL(currentUser.downloadURL)
           : setImageURL(null);
       }
@@ -241,6 +242,13 @@ function Profile(props) {
           </View>
         )}
       </View>
+      <Divider
+        width={1}
+        inset
+        insetType="middle"
+        color="#ed5b2d"
+        style={{ opacity: 0.5 }}
+      />
       <View style={styles.galleryContainer}>
         {userPosts.length > 0 ? (
           <FlatList
@@ -267,17 +275,18 @@ function Profile(props) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    // marginTop: 40,
   },
   infoContainer: {
     margin: 10,
+    padding: 10,
+    paddingTop: -10,
   },
   image: {
     flex: 1,
     aspectRatio: 1 / 1,
   },
   galleryContainer: {
-    padding: 2,
+    padding: 3,
   },
   imageContainer: {
     flex: 1 / 3,
