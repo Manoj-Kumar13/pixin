@@ -1,12 +1,14 @@
 import React from "react";
 import { useState } from "react";
-import { View, TextInput, Image, Button } from "react-native";
+import { View, Image } from "react-native";
 import firebase from "firebase";
 require("firebase/firestore");
 require("firebase/firebase-storage");
+import { Input, Divider, Button } from "@rneui/themed";
 
 export default function Save(props, { navigation }) {
   const [caption, setCaption] = useState("");
+  console.log("image props", props.route.params.image);
 
   const uploadImage = async () => {
     const uri = props.route.params.image;
@@ -57,15 +59,44 @@ export default function Save(props, { navigation }) {
     <View
       style={{
         flex: 1,
+        padding: 20,
       }}
     >
-      <Image source={{ uri: props.route.params.image }} />
-      <TextInput
+      <Image source={{ uri: props.route.params.image }} style={{ flex: 0.7 }} />
+      <Divider
+        style={{ margin: 20, opacity: 0.5 }}
+        color="#ed5b2d"
+        insetType="middle"
+        subHeaderStyle={{}}
+        width={1}
+        orientation="horizontal"
+      />
+      <Input
         placeholder="Write a caption..."
         onChangeText={(caption) => setCaption(caption)}
+        containerStyle={{}}
+        disabledInputStyle={{ background: "#ed5b2d" }}
+        inputContainerStyle={{ paddingLeft: 5 }}
+        inputStyle={{}}
+        label="Caption"
+        labelStyle={{ color: "#ed5b2d" }}
+        labelProps={{}}
+        leftIcon={{
+          type: "font-awesome",
+          name: "heartbeat",
+          color: "#ed5b2d",
+        }}
+        leftIconContainerStyle={{}}
+        rightIconContainerStyle={{}}
       />
 
-      <Button title="Save" onPress={() => uploadImage()} />
+      <Button
+        title="Save"
+        onPress={() => uploadImage()}
+        radius={20}
+        color="#ed5b2d"
+        buttonStyle={{ width: "80%", alignSelf: "center" }}
+      />
     </View>
   );
 }

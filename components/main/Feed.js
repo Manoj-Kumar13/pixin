@@ -1,17 +1,72 @@
 import React, { useEffect, useState } from "react";
-import {
-  StyleSheet,
-  Text,
-  View,
-  Image,
-  FlatList,
-  Button,
-  TouchableHighlight,
-} from "react-native";
+import { StyleSheet, Text, View, Image, FlatList, Button } from "react-native";
 import firebase from "firebase";
 require("firebase/firestore");
 import { connect } from "react-redux";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
+import { Card } from "@rneui/themed";
+import { Avatar, Divider, Icon } from "@rneui/base";
+
+// const MyCard = ({ item }) => {
+//   return (
+//     <Card containerStyle={{ borderRadius: 15 }}>
+//       <View style={styles.userInfoStyle}>
+//         <Avatar source={{ uri: item.user.downloadURL }} rounded />
+//         <Text
+//           style={{
+//             marginLeft: 10,
+//             marginTop: "auto",
+//             marginBottom: "auto",
+//             fontSize: 20,
+//             fontWeight: "bold",
+//           }}
+//         >
+//           {item.user.name}
+//         </Text>
+//       </View>
+//       <Card.Divider color="#ed5b2d" style={{ opacity: 0.5 }} />
+//       <View>
+//         <Image
+//           source={{ uri: item.downloadURL }}
+//           style={{ flex: 1, aspectRatio: 1 / 1 }}
+//         />
+//       </View>
+//       <View
+//         style={{
+//           flexDirection: "row",
+//           alignItems: "center",
+//           padding: 5,
+//           marginTop: 5,
+//           backgroundColor: "#E9eaea",
+//           borderRadius: 15,
+//         }}
+//       >
+//         <Icon name="heartbeat" type="font-awesome" color="#ed5b2d" />
+//         <Text style={{ fontSize: 15, padding: 10, flex: 1 }}>
+//           {item.caption}
+//         </Text>
+//       </View>
+//       <View>
+//         {item.currentUserLike ? (
+//           <Icon
+//             name="heart"
+//             type="font-awesome"
+//             color="red"
+//             onPress={() => onDislikePress(item.user.uid, item.id)}
+//           />
+//         ) : (
+//           <Icon
+//             name="heart"
+//             type="font-awesome"
+//             color="red"
+//             size={30}
+//             onPress={() => onLikePress(item.user.uid, item.id)}
+//           />
+//         )}
+//       </View>
+//     </Card>
+//   );
+// };
 
 function Feed(props) {
   const [posts, setPosts] = useState([]);
@@ -71,56 +126,86 @@ function Feed(props) {
             data={posts}
             renderItem={({ item }) => (
               <View style={styles.imageContainer}>
-                <View style={styles.username}>
-                  <View style={styles.feedProfileContainer}>
-                    {item.user.downloadURL ? (
-                      <Image
-                        style={styles.feedProfileImage}
-                        source={{ uri: item.user.downloadURL }}
+                <Card containerStyle={{ borderRadius: 15 }}>
+                  <View style={styles.userInfoStyle}>
+                    <Avatar source={{ uri: item.user.downloadURL }} rounded />
+                    <Text
+                      style={{
+                        marginLeft: 10,
+                        marginTop: "auto",
+                        marginBottom: "auto",
+                        fontSize: 20,
+                        fontWeight: "bold",
+                      }}
+                    >
+                      {item.user.name}
+                    </Text>
+                  </View>
+                  <Card.Divider color="#ed5b2d" style={{ opacity: 0.5 }} />
+                  <View>
+                    <Image
+                      source={{ uri: item.downloadURL }}
+                      style={{ flex: 1, aspectRatio: 1 / 1 }}
+                    />
+                  </View>
+                  <View
+                    style={{
+                      flexDirection: "row",
+                      alignItems: "center",
+                      padding: 5,
+                      marginTop: 5,
+                      backgroundColor: "#E9eaea",
+                      borderRadius: 15,
+                    }}
+                  >
+                    <Icon
+                      name="heartbeat"
+                      type="font-awesome"
+                      color="#ed5b2d"
+                    />
+                    <Text style={{ fontSize: 15, padding: 10, flex: 1 }}>
+                      {item.caption}
+                    </Text>
+                  </View>
+                  <View
+                    style={{
+                      flexDirection: "row",
+                      alignItems: "center",
+                      marginTop: 5,
+                    }}
+                  >
+                    {item.currentUserLike ? (
+                      <Icon
+                        name="heart"
+                        type="font-awesome"
+                        color="#B52020"
+                        size={30}
+                        onPress={() => onDislikePress(item.user.uid, item.id)}
                       />
                     ) : (
-                      <MaterialCommunityIcons
-                        name="account-circle"
-                        size={25}
-                        style={{ marginRight: 5 }}
+                      <Icon
+                        name="heart-o"
+                        type="font-awesome"
+                        color="#ed5b2d"
+                        size={30}
+                        onPress={() => onLikePress(item.user.uid, item.id)}
                       />
                     )}
-                  </View>
-                  <Text style={styles.text}>{item.user.name}</Text>
-                </View>
-                <View style={styles.post}>
-                  <Image
-                    style={styles.image}
-                    source={{ uri: item.downloadURL }}
-                  />
-                </View>
-                {item.currentUserLike ? (
-                  <Button
-                    title="Dislike"
-                    onPress={() => onDislikePress(item.user.uid, item.id)}
-                  />
-                ) : (
-                  <TouchableHighlight style={styles.likeButton}>
-                    <Button
-                      title="Like"
-                      onPress={() => onLikePress(item.user.uid, item.id)}
+                    <Icon
+                      name="comments"
+                      type="fontisto"
+                      size={30}
+                      style={{ marginLeft: 10 }}
+                      color="#ed5b2d"
+                      onPress={() => {
+                        props.navigation.navigate("Comments", {
+                          postId: item.id,
+                          uid: item.user.uid,
+                        });
+                      }}
                     />
-                  </TouchableHighlight>
-                )}
-                <Text
-                  style={{
-                    fontSize: 15,
-                    padding: 5,
-                  }}
-                  onPress={() => {
-                    props.navigation.navigate("Comments", {
-                      postId: item.id,
-                      uid: item.user.uid,
-                    });
-                  }}
-                >
-                  View Comments...
-                </Text>
+                  </View>
+                </Card>
               </View>
             )}
           />
@@ -178,6 +263,12 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     marginRight: 5,
+  },
+  userInfoStyle: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    marginBottom: 5,
   },
 });
 
