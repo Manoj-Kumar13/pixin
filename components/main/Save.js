@@ -1,21 +1,23 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useState } from "react";
-import { View, Image } from "react-native";
+import { View, Image, BackHandler } from "react-native";
 import firebase from "firebase";
 require("firebase/firestore");
 require("firebase/firebase-storage");
 import { Input, Divider, Button } from "@rneui/themed";
+import { Alert } from "react-native";
+import { useFocusEffect } from "@react-navigation/native";
 
 export default function Save(props, { navigation }) {
   const [caption, setCaption] = useState("");
-  console.log("image props", props.route.params.image);
+  // console.log("image props", props.route.params.image);
 
   const uploadImage = async () => {
     const uri = props.route.params.image;
     const childPath = `post/${
       firebase.auth().currentUser.uid
     }/${Math.random().toString(36)}`;
-    console.log(childPath);
+    // console.log(childPath);
 
     const response = await fetch(uri);
     const blob = await response.blob();
@@ -29,31 +31,35 @@ export default function Save(props, { navigation }) {
     const taskCompleted = () => {
       task.snapshot.ref.getDownloadURL().then((snapshot) => {
         savePostData(snapshot);
-        console.log(snapshot);
+        // console.log(snapshot);
       });
     };
 
     const taskError = (snapshot) => {
-      console.log(snapshot);
+      // console.log(snapshot);
     };
 
     task.on("state_changed", taskProgress, taskError, taskCompleted);
   };
 
   const savePostData = (downloadURL) => {
-    firebase
-      .firestore()
-      .collection("posts")
-      .doc(firebase.auth().currentUser.uid)
-      .collection("userposts")
-      .add({
-        downloadURL,
-        caption,
-        creation: firebase.firestore.FieldValue.serverTimestamp(),
-      })
-      .then(() => {
-        props.navigation.popToTop();
-      });
+    if (caption.trim().length > 0) {
+      firebase
+        .firestore()
+        .collection("posts")
+        .doc(firebase.auth().currentUser.uid)
+        .collection("userposts")
+        .add({
+          downloadURL,
+          caption,
+          creation: firebase.firestore.FieldValue.serverTimestamp(),
+        })
+        .then(() => {
+          props.navigation.popToTop();
+        });
+    } else {
+      Alert.alert("Unable to upload", "Caption can't be empty");
+    }
   };
   return (
     <View
@@ -73,6 +79,7 @@ export default function Save(props, { navigation }) {
       />
       <Input
         placeholder="Write a caption..."
+        maxLength={50}
         onChangeText={(caption) => setCaption(caption)}
         containerStyle={{}}
         disabledInputStyle={{ background: "#ed5b2d" }}

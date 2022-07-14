@@ -5,6 +5,7 @@ import { SafeAreaView } from "react-native";
 import GlobalStyles from "../../GlobalStyles";
 import { Button, Input } from "@rneui/themed";
 import img from "../../assets/trans.png";
+import { Alert } from "react-native";
 
 export class Register extends Component {
   constructor(props) {
@@ -22,19 +23,40 @@ export class Register extends Component {
 
   onSignUp() {
     const { email, password, name } = this.state;
-    firebase
-      .auth()
-      .createUserWithEmailAndPassword(email, password)
-      .then((result) => {
-        firebase
-          .firestore()
-          .collection("users")
-          .doc(firebase.auth().currentUser.uid)
-          .set({
-            name,
-            email,
-          });
-      });
+    const regx = /\S+@\S+\.\S+/.test(email);
+    if (!regx) {
+      Alert.alert(
+        "Invalid email provided",
+        "Please make sure email is correct"
+      );
+      return;
+    }
+    if (password.trim().length >= 6 && name.trim().length >= 4) {
+      firebase
+        .auth()
+        .createUserWithEmailAndPassword(email, password)
+        .then((result) => {
+          firebase
+            .firestore()
+            .collection("users")
+            .doc(firebase.auth().currentUser.uid)
+            .set({
+              name,
+              email,
+            })
+            .catch((error) => {
+              Alert.alert(
+                "Unable to Register",
+                "Please check information provided or try again later"
+              );
+            });
+        });
+    } else {
+      Alert.alert(
+        "Invalid Information provided",
+        "Name and Password should be more than 4 and 6 characters"
+      );
+    }
   }
 
   onIconPress = () => {
@@ -60,6 +82,7 @@ export class Register extends Component {
           label="Name"
           leftIcon={{ type: "fontisto", name: "person" }}
           onChangeText={(name) => this.setState({ name })}
+          maxLength={16}
         />
         <Input
           style={styles.textInput}
@@ -81,6 +104,7 @@ export class Register extends Component {
             onPress: this.onIconPress,
           }}
           onChangeText={(password) => this.setState({ password })}
+          maxLength={30}
         />
         <Button
           onPress={() => {

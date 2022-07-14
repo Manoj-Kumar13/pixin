@@ -5,6 +5,7 @@ import {
   StyleSheet,
   TouchableHighlight,
   Image,
+  Alert,
 } from "react-native";
 import firebase from "firebase";
 import { SafeAreaView } from "react-native";
@@ -27,7 +28,23 @@ export class Login extends Component {
 
   onLogin() {
     const { email, password } = this.state;
-    firebase.auth().signInWithEmailAndPassword(email, password);
+    const regx = /\S+@\S+\.\S+/.test(email);
+    if (!regx) {
+      Alert.alert(
+        "Invalid email provided",
+        "Please make sure email is correct"
+      );
+      return;
+    }
+    firebase
+      .auth()
+      .signInWithEmailAndPassword(email, password)
+      .catch((error) => {
+        Alert.alert(
+          "Unable to Login",
+          "Please check information provided or try again later"
+        );
+      });
   }
 
   onIconPress = () => {
@@ -67,6 +84,7 @@ export class Login extends Component {
               onPress: this.onIconPress,
             }}
             onChangeText={(password) => this.setState({ password })}
+            maxLength={30}
           />
           <Button
             title="Login"

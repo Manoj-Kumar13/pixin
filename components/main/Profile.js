@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import {
   StyleSheet,
-  Text,
+  // Text,s
   View,
   Image,
   FlatList,
@@ -16,8 +16,9 @@ import * as ImagePicker from "expo-image-picker";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 require("firebase/firestore");
 require("firebase/firebase-storage");
-import { Button } from "@rneui/themed";
+import { Avatar, Button, Card, Icon } from "@rneui/themed";
 import { Divider } from "@rneui/themed";
+import { Modal, Portal, Text, Provider } from "react-native-paper";
 
 function Profile(props) {
   const [userPosts, setUserPosts] = useState([]);
@@ -25,6 +26,13 @@ function Profile(props) {
   const [following, setFollowing] = useState(false);
   const [imageURL, setImageURL] = useState(null);
   const [flag, setFlag] = useState(0);
+  const [visible, setVisible] = useState(false);
+  const [cimg, setCimg] = useState(null);
+
+  const showModal = () => setVisible(true);
+  const hideModal = () => setVisible(false);
+
+  const containerStyle = { backgroundColor: "white", padding: 20 };
 
   useEffect(() => {
     const { currentUser, posts } = props;
@@ -135,7 +143,7 @@ function Profile(props) {
       quality: 0.6,
     });
 
-    console.log("result: ", result);
+    // console.log("result: ", result);
     const childPath = `profilePic/${
       firebase.auth().currentUser.uid
     }/currentProfilePic`;
@@ -180,95 +188,151 @@ function Profile(props) {
   }
 
   return (
-    <View style={styles.container}>
-      <View style={styles.infoContainer}>
-        <View style={styles.profileInfo}>
-          <View style={styles.profilePic}>
-            {imageURL != null ? (
-              <Image
-                style={styles.profileImage}
-                source={imageURL && { uri: imageURL }}
-              />
-            ) : (
-              <MaterialCommunityIcons name="account-circle" size={80} />
-            )}
-          </View>
-          <View style={styles.profileName}>
-            <Text style={styles.username}>{user.name}</Text>
-            <Text style={styles.email}>{user.email}</Text>
-          </View>
-        </View>
-
-        {props.route.params.uid !== firebase.auth().currentUser.uid ? (
-          <View>
-            {following ? (
-              <Button
-                title="Following"
-                color="#ed5b2d"
-                onPress={() => onUnfollow()}
-              />
-            ) : (
-              <Button
-                title="Follow"
-                color="#ed5b2d"
-                onPress={() => onFollow()}
-              />
-            )}
-          </View>
-        ) : (
-          <View>
-            <TouchableHighlight style={styles.button}>
-              <Button
-                title="Edit Profile"
-                color="#ed5b2d"
-                radius={20}
-                raised={true}
-                onPress={() => editProfile()}
-              />
-            </TouchableHighlight>
-            <Button
-              title="LogOut"
-              color="#ed5b2d"
-              type="outline"
-              buttonStyle={{
-                borderColor: "#ed5b2d",
-              }}
-              titleStyle={{
-                color: "#ed5b2d",
-              }}
-              radius={20}
-              onPress={() => onLogout()}
-            />
-          </View>
-        )}
-      </View>
-      <Divider
-        width={1}
-        inset
-        insetType="middle"
-        color="#ed5b2d"
-        style={{ opacity: 0.5 }}
-      />
-      <View style={styles.galleryContainer}>
-        {userPosts.length > 0 ? (
-          <FlatList
-            numColumns={3}
-            horizontal={false}
-            data={userPosts}
-            renderItem={({ item }) => (
-              <View style={styles.imageContainer}>
+    <Provider>
+      <View style={styles.container}>
+        <View style={styles.infoContainer}>
+          <View style={styles.profileInfo}>
+            <View style={styles.profilePic}>
+              {imageURL != null ? (
                 <Image
-                  style={styles.image}
-                  source={{ uri: item.downloadURL }}
+                  style={styles.profileImage}
+                  source={imageURL && { uri: imageURL }}
+                />
+              ) : (
+                <MaterialCommunityIcons name="account-circle" size={80} />
+              )}
+            </View>
+            <View style={styles.profileName}>
+              <Text style={styles.username}>{user.name}</Text>
+              <Text style={styles.email}>{user.email}</Text>
+            </View>
+          </View>
+
+          {props.route.params.uid !== firebase.auth().currentUser.uid ? (
+            <View>
+              {following ? (
+                <Button
+                  title="Following"
+                  color="#ed5b2d"
+                  onPress={() => onUnfollow()}
+                />
+              ) : (
+                <Button
+                  title="Follow"
+                  color="#ed5b2d"
+                  onPress={() => onFollow()}
+                />
+              )}
+            </View>
+          ) : (
+            <View>
+              <TouchableHighlight style={styles.button}>
+                <Button
+                  title="Edit Profile"
+                  color="#ed5b2d"
+                  radius={20}
+                  raised={true}
+                  onPress={() => editProfile()}
+                />
+              </TouchableHighlight>
+              <Button
+                title="LogOut"
+                color="#ed5b2d"
+                type="outline"
+                buttonStyle={{
+                  borderColor: "#ed5b2d",
+                }}
+                titleStyle={{
+                  color: "#ed5b2d",
+                }}
+                radius={20}
+                onPress={() => onLogout()}
+              />
+            </View>
+          )}
+        </View>
+        <Divider
+          width={1}
+          inset
+          insetType="middle"
+          color="#ed5b2d"
+          style={{ opacity: 0.5 }}
+        />
+        <View style={styles.galleryContainer}>
+          {userPosts.length > 0 ? (
+            <FlatList
+              numColumns={3}
+              horizontal={false}
+              data={userPosts}
+              renderItem={({ item, index }) => (
+                <TouchableHighlight
+                  style={styles.imageContainer}
+                  onPress={() => {
+                    setCimg(index);
+                    showModal;
+                  }}
+                >
+                  <Image
+                    style={styles.image}
+                    source={{ uri: item.downloadURL }}
+                  />
+                </TouchableHighlight>
+              )}
+            />
+          ) : (
+            <Text style={styles.noPostText}>No Post Available</Text>
+          )}
+        </View>
+      </View>
+      <Portal>
+        <Modal
+          visible={visible}
+          onDismiss={hideModal}
+          contentContainerStyle={containerStyle}
+        >
+          <View style={styles.imageContainer}>
+            <Card containerStyle={{ borderRadius: 20 }}>
+              <View style={styles.userInfoStyle}>
+                <Avatar source={{ uri: imageURL ? imageURL : null }} rounded />
+                <Text
+                  style={{
+                    marginLeft: 10,
+                    marginTop: "auto",
+                    marginBottom: "auto",
+                    fontSize: 20,
+                    fontWeight: "bold",
+                  }}
+                >
+                  {user?.name}
+                </Text>
+              </View>
+              <Card.Divider color="#ed5b2d" style={{ opacity: 0.5 }} />
+              <View>
+                <Image
+                  source={{ uri: userPosts[cimg]?.downloadURL }}
+                  style={{ flex: 1, aspectRatio: 1 / 1 }}
                 />
               </View>
-            )}
-          />
-        ) : (
-          <Text style={styles.noPostText}>No Post Available</Text>
-        )}
-      </View>
-    </View>
+              <View
+                style={{
+                  flexDirection: "row",
+                  alignItems: "center",
+                  padding: 5,
+                  marginTop: 5,
+                  backgroundColor: "#E9eaea",
+                  borderRadius: 15,
+                }}
+              >
+                <Icon name="heartbeat" type="font-awesome" color="#ed5b2d" />
+                <Text style={{ fontSize: 15, padding: 10, flex: 1 }}>
+                  {userPosts[cimg]?.caption}
+                </Text>
+              </View>
+            </Card>
+          </View>
+        </Modal>
+      </Portal>
+    </Provider>
   );
 }
 
