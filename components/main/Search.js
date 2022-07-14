@@ -30,11 +30,11 @@ export default function Search(props) {
         placeholder="Search Here..."
         onChangeText={(search) => {
           setSearch(search);
-          console.log(users);
           return fetchUsers(search);
         }}
         platform="ios"
         value={search}
+        maxLength={50}
       />
       <View style={styles.listContainer}>
         <ScrollView showsVerticalScrollIndicator={false}>

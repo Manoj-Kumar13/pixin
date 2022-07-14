@@ -5,6 +5,7 @@ import {
   FlatList,
   StyleSheet,
   TouchableHighlight,
+  Alert,
 } from "react-native";
 import firebase from "firebase";
 require("firebase/firestore");
@@ -60,20 +61,24 @@ function Comments(props) {
   }, [props.route.params.postId, props.users]);
 
   const onCommentSend = () => {
-    firebase
-      .firestore()
-      .collection("posts")
-      .doc(props.route.params.uid)
-      .collection("userposts")
-      .doc(props.route.params.postId)
-      .collection("comments")
-      .add({
-        creator: firebase.auth().currentUser.uid,
-        text,
-      })
-      .then(() => {
-        setText("");
-      });
+    if (text.trim().length > 0) {
+      firebase
+        .firestore()
+        .collection("posts")
+        .doc(props.route.params.uid)
+        .collection("userposts")
+        .doc(props.route.params.postId)
+        .collection("comments")
+        .add({
+          creator: firebase.auth().currentUser.uid,
+          text,
+        })
+        .then(() => {
+          setText("");
+        });
+    } else {
+      Alert.alert("Unable to send", "Comment field can't be empty");
+    }
   };
 
   return (
@@ -89,6 +94,7 @@ function Comments(props) {
           onChangeText={(text) => {
             setText(text);
           }}
+          maxLength={50}
         />
         <Button
           title="Send"

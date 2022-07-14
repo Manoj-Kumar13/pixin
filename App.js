@@ -26,6 +26,7 @@ import MainScreen from "./components/Main";
 import AddScreen from "./components/main/Add";
 import SaveScreen from "./components/main/Save";
 import CommentScreen from "./components/main/Comments";
+import { Icon } from "@rneui/themed";
 
 const Stack = createStackNavigator();
 

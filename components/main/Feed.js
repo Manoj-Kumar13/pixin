@@ -126,7 +126,7 @@ function Feed(props) {
             data={posts}
             renderItem={({ item }) => (
               <View style={styles.imageContainer}>
-                <Card containerStyle={{ borderRadius: 15 }}>
+                <Card containerStyle={{ borderRadius: 20 }}>
                   <View style={styles.userInfoStyle}>
                     <Avatar source={{ uri: item.user.downloadURL }} rounded />
                     <Text
@@ -171,7 +171,7 @@ function Feed(props) {
                     style={{
                       flexDirection: "row",
                       alignItems: "center",
-                      marginTop: 5,
+                      paddingLeft: 5,
                     }}
                   >
                     {item.currentUserLike ? (
@@ -179,7 +179,8 @@ function Feed(props) {
                         name="heart"
                         type="font-awesome"
                         color="#B52020"
-                        size={30}
+                        size={20}
+                        raised={true}
                         onPress={() => onDislikePress(item.user.uid, item.id)}
                       />
                     ) : (
@@ -187,16 +188,17 @@ function Feed(props) {
                         name="heart-o"
                         type="font-awesome"
                         color="#ed5b2d"
-                        size={30}
+                        size={20}
+                        raised={true}
                         onPress={() => onLikePress(item.user.uid, item.id)}
                       />
                     )}
                     <Icon
                       name="comments"
                       type="fontisto"
-                      size={30}
-                      style={{ marginLeft: 10 }}
+                      size={20}
                       color="#ed5b2d"
+                      raised={true}
                       onPress={() => {
                         props.navigation.navigate("Comments", {
                           postId: item.id,
